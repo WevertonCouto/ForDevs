@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:meta/meta.dart';
 
+import 'package:fordev_app/domain/usecases/usecases.dart';
+
 class RemoteAuthentication {
   final HttpClient httpClient;
   final String url;
@@ -12,16 +14,22 @@ class RemoteAuthentication {
     @required this.url,
   });
 
-  Future<void> auth() async {
-    httpClient.request(url: url, method: 'post');
+  Future<void> auth(AuthenticationParams params) async {
+    final body = {
+      'email': params.email,
+      'password': params.secret,
+    };
+    httpClient.request(
+      url: url,
+      method: 'post',
+      body: body,
+    );
   }
 }
 
 abstract class HttpClient {
-  Future<void> request({
-    @required String url,
-    @required String method,
-  }) async {}
+  Future<void> request(
+      {@required String url, @required String method, Map body}) async {}
 }
 
 class HttpClientSpy extends Mock implements HttpClient {}
@@ -37,10 +45,21 @@ void main() {
   });
 
   test('Should call HttpClient with correct values', () async {
+    // arrange
+    final params = AuthenticationParams(
+      email: faker.internet.email(),
+      secret: faker.internet.password(),
+    );
+
     // act
-    await sut.auth();
+    await sut.auth(params);
 
     //assert
-    verify(httpClient.request(url: url, method: 'post'));
+    verify(
+      httpClient.request(url: url, method: 'post', body: {
+        'email': params.email,
+        'password': params.secret,
+      }),
+    );
   });
 }
