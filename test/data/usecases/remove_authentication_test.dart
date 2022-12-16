@@ -1,11 +1,11 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fordev_app/domain/helpers/helpers.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:fordev_app/data/usecases/usecases.dart';
 import 'package:fordev_app/data/http/http.dart';
 import 'package:fordev_app/domain/usecases/usecases.dart';
+import 'package:fordev_app/domain/helpers/helpers.dart';
 
 class HttpClientSpy extends Mock implements HttpClient {}
 
@@ -134,5 +134,22 @@ void main() {
 
     //assert
     expect(account.token, accessToken);
+  });
+
+  test(
+      'Should throw UnexpectedError if HttpClient returns 200 with invalid data',
+      () async {
+    // arrange
+    when(httpClient.request(
+      url: anyNamed('url'),
+      method: anyNamed('method'),
+      body: anyNamed('body'),
+    )).thenAnswer((_) async => {'invalid_key': 'invalid_value'});
+
+    // act
+    final future = sut.auth(params);
+
+    //assert
+    expect(future, throwsA(DomainError.unexpected));
   });
 }
