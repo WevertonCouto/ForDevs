@@ -1,3 +1,4 @@
+import 'package:fordev_app/data/models/models.dart';
 import 'package:meta/meta.dart';
 
 import '../../domain/usecases/usecases.dart';
@@ -21,7 +22,7 @@ class RemoteAuthentication {
         method: 'post',
         body: RemoteAuthenticationParams.fromDomain(params).toMap(),
       );
-      return AccountEntity.fromMap(httpResponse);
+      return RemoteAccountModel.fromMap(httpResponse).toEntity();
     } on HttpError catch (error) {
       throw error == HttpError.unauthorized
           ? DomainError.invalidCredentials
