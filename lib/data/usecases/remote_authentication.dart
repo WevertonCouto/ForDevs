@@ -1,12 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:meta/meta.dart';
-
-import 'package:fordev_app/domain/entities/account_entity.dart';
 
 import '../../domain/usecases/usecases.dart';
 import '../http/http.dart';
+import '../../domain/helpers/helpers.dart';
 
 class RemoteAuthentication {
   final HttpClient httpClient;
@@ -18,11 +14,15 @@ class RemoteAuthentication {
   });
 
   Future<void> auth(AuthenticationParams params) async {
-    httpClient.request(
-      url: url,
-      method: 'post',
-      body: RemoteAuthenticationParams.fromDomain(params).toMap(),
-    );
+    try {
+      httpClient.request(
+        url: url,
+        method: 'post',
+        body: RemoteAuthenticationParams.fromDomain(params).toMap(),
+      );
+    } on HttpError {
+      throw DomainError.unexpected;
+    } catch (e) {}
   }
 }
 
