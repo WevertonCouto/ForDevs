@@ -26,6 +26,12 @@
             "type": "dart",
             "request": "launch",
             "program": "./test/"
+        },
+        {
+            "name": "Flutter",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main/main.dart"
         }
     ]
 }
