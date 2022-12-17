@@ -11,7 +11,14 @@ class HttpAdapter {
 
   Future<void> request(
       {@required String url, @required String method, Map body}) async {
-    await client.post(url);
+    final headers = {
+      'content-type': 'application/json',
+      'accept': 'application/json',
+    };
+    await client.post(
+      url,
+      headers: headers,
+    );
   }
 }
 
@@ -30,7 +37,13 @@ void main() {
 
       // assert
       verify(
-        client.post(url),
+        client.post(
+          url,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        ),
       );
     });
   });
