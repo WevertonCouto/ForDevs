@@ -183,6 +183,25 @@ void main() {
       );
     });
 
+    test('Should return badRequestError if post returns 401', () async {
+      // arrange
+      mockResponse(401);
+
+      // act
+      final future = sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        future,
+        throwsA(
+          HttpError.unauthorized,
+        ),
+      );
+    });
+
     test('Should return ServerError if post returns 500', () async {
       // arrange
       mockResponse(
