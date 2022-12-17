@@ -182,5 +182,26 @@ void main() {
         ),
       );
     });
+
+    test('Should return ServerError if post returns 500', () async {
+      // arrange
+      mockResponse(
+        500,
+      );
+
+      // act
+      final future = sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        future,
+        throwsA(
+          HttpError.serverError,
+        ),
+      );
+    });
   });
 }
