@@ -52,6 +52,10 @@ void main() {
       );
     }
 
+    void mockError() {
+      mockRequest().thenThrow(Exception());
+    }
+
     setUp(() {
       mockResponse(200);
     });
@@ -263,6 +267,25 @@ void main() {
       mockResponse(
         500,
       );
+
+      // act
+      final future = sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        future,
+        throwsA(
+          HttpError.serverError,
+        ),
+      );
+    });
+
+    test('Should return ServerError if post throws', () async {
+      // arrange
+      mockError();
 
       // act
       final future = sut.request(
