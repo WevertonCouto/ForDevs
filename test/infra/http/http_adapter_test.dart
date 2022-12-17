@@ -6,12 +6,14 @@ import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:meta/meta.dart';
 
-class HttpAdapter {
+import 'package:fordev_app/data/http/http.dart';
+
+class HttpAdapter implements HttpClient {
   final Client client;
 
   HttpAdapter(this.client);
 
-  Future<void> request(
+  Future<Map<String, dynamic>> request(
       {@required String url, @required String method, Map body}) async {
     final headers = {
       'content-type': 'application/json',
@@ -19,11 +21,12 @@ class HttpAdapter {
     };
     final jsonBody = body != null ? jsonEncode(body) : null;
 
-    await client.post(
+    final response = await client.post(
       url,
       headers: headers,
       body: jsonBody,
     );
+    return response.body.isEmpty ? null : jsonDecode(response.body);
   }
 }
 
@@ -43,6 +46,11 @@ void main() {
     test('Should call post with correct values', () async {
       //arrange
       final body = {'any_key': 'any_value'};
+      when(
+        client.post(any, headers: anyNamed('headers'), body: anyNamed('body')),
+      ).thenAnswer(
+        (_) async => Response(jsonEncode(body), 200),
+      );
 
       // act
       await sut.request(
@@ -65,6 +73,18 @@ void main() {
     });
 
     test('Should call post without body', () async {
+      // arrange
+      final body = {'any_key': 'any_value'};
+      when(
+        client.post(
+          any,
+          headers: anyNamed('headers'),
+          body: anyNamed('body'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(jsonEncode(body), 200),
+      );
+
       // act
       await sut.request(
         url: url,
@@ -77,6 +97,55 @@ void main() {
           any,
           headers: anyNamed('headers'),
         ),
+      );
+    });
+
+    test('Should return data if post returns 200', () async {
+      // arrange
+      final body = {'any_key': 'any_value'};
+      when(
+        client.post(
+          any,
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(jsonEncode(body), 200),
+      );
+
+      // act
+      final response = await sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        response,
+        body,
+      );
+    });
+
+    test('Should return null if post returns 200 with no data', () async {
+      // arrange
+      when(
+        client.post(
+          any,
+          headers: anyNamed('headers'),
+        ),
+      ).thenAnswer(
+        (_) async => Response('', 200),
+      );
+
+      // act
+      final response = await sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        response,
+        null,
       );
     });
   });
