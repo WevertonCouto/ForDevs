@@ -133,5 +133,22 @@ void main() {
         null,
       );
     });
+
+    test('Should return null if post returns 204', () async {
+      // arrange
+      mockResponse(204, body: '');
+
+      // act
+      final response = await sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        response,
+        null,
+      );
+    });
   });
 }
