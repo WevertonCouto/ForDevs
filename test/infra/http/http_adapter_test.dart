@@ -221,6 +221,25 @@ void main() {
       );
     });
 
+    test('Should return notFoundError if post returns 404', () async {
+      // arrange
+      mockResponse(404);
+
+      // act
+      final future = sut.request(
+        url: url,
+        method: 'post',
+      );
+
+      // assert
+      expect(
+        future,
+        throwsA(
+          HttpError.notFound,
+        ),
+      );
+    });
+
     test('Should return ServerError if post returns 500', () async {
       // arrange
       mockResponse(
